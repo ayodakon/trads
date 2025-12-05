@@ -1,127 +1,49 @@
-# ============================================
-# TRADING BOT SPECIFIC
-# ============================================
-
-# ��� API & SECRETS (MOST IMPORTANT!)
-.env
-.env.local
-.env.*.local
-secrets.enc
-*.key
-*.pem
-
-# ��� DATA FILES (generated, not source)
-data/*.csv
-data/*.pkl
-data/*.json
-data/*.h5
-data/raw/
-data/processed/
-
-# ��� RESULTS & LOGS
-results/
-reports/
-charts/
-logs/
-*.log
-log.txt
-debug.log
-
-# ��� BACKTEST OUTPUTS
-backtest_results/
-optimization_results/
-
-# ============================================
-# PYTHON DEFAULT
-# ============================================
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# ============================================
-# VIRTUAL ENVIRONMENT
-# ============================================
-venv/
 env/
-ENV/
-.env/
-.venv/
-env.bak/
-venv.bak/
+venv/
 
-# ============================================
-# IDE & EDITOR
-# ============================================
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-*.sublime-*
-
-# ============================================
-# OS & SYSTEM
-# ============================================
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# ============================================
-# TEMPORARY & BACKUP
-# ============================================
-*.tmp
-*.temp
-*.bak
-*.backup
-*.old
-*.orig
-*_backup
+# API Keys & Secrets
+.env
+.env.local
+python_binance.py
 
 # Backup files
+*.bak
+*.backup
+*.original
 backup_*
 trads_backup_*
-
-# API Keys (jangan commit ke GitHub!)
-python_binance.py
 
 # Logs
 *.log
 logs/
 
-# Data files (besar)
+# Data files
 *.csv
+*.json
 data/*.csv
+data/*.json
 
-# Results
+# Results & Reports
 results/
 reports/
 charts/
 
 # Temporary files
-__pycache__/
-*.pyc
-config/api_config.py.bitget.original
-data/fetcher.py.bitget.original
+temp/
+tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,39 @@
+from binance.client import Client
+
+# ============================================
+# BINANCE TESTNET API CONFIGURATION
+# ============================================
+# 1. Go to: https://testnet.binance.vision/
+# 2. Login and generate API Key
+# 3. Copy your keys below:
+
+api_key = 'YOUR_API_KEY_HERE'
+api_secret = 'YOUR_SECRET_KEY_HERE'
+
+# ============================================
+# FUNCTIONS
+# ============================================
+def get_client():
+    """Get Binance client instance"""
+    return Client(api_key, api_secret, testnet=True)
+
+def get_account_info():
+    """Get account balance"""
+    client = get_client()
+    return client.get_account()
+
+def test_connection():
+    """Test connection to Binance"""
+    client = get_client()
+    try:
+        balance = client.get_account()
+        print("✅ Binance connection successful")
+        return True
+    except Exception as e:
+        print(f"❌ Binance connection failed: {e}")
+        return False
+
+# Only run test if executed directly
+if __name__ == "__main__":
+    print("Testing Binance connection...")
+    test_connection()
