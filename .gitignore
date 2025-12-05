@@ -123,3 +123,5 @@ charts/
 # Temporary files
 __pycache__/
 *.pyc
+config/api_config.py.bitget.original
+data/fetcher.py.bitget.original

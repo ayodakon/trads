@@ -223,3 +223,21 @@ print("💰 Initial Capital: 15 NXPC (≈$7.00)")
 print("⚡ Strategy: SMA(20/45) with 5% Stop Loss")
 print("🔄 Compounding: ENABLED (100% reinvest)")
 print("✅ Settings initialized for SMALL CAPITAL TRADING")
+# ===== BINANCE-SPECIFIC SETTINGS =====
+# NXPC/USDT trading settings
+NXPC_SETTINGS = {
+    'min_qty': 0.1,          # Minimum order quantity
+    'step_size': 0.1,        # Order increment
+    'min_notional': 1.0,     # Minimum order value (USD)
+    'default_qty': 10,       # Default quantity for paper trading
+}
+
+# Binance API rate limits
+BINANCE_RATE_LIMITS = {
+    'requests_per_minute': 1200,
+    'orders_per_second': 10,
+    'orders_per_day': 160000,
+}
+
+# Default timeframe for Binance
+BINANCE_TIMEFRAMES = ['1m', '5m', '15m', '30m', '1h', '4h', '1d', '1w']

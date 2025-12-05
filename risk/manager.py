@@ -1,3 +1,4 @@
+from config.settings import settings
 # risk/manager.py
 """
 Risk management system

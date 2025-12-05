@@ -1,6 +1,6 @@
-# utils/visualization.py - FIX PIE CHART ERROR
+# utils/visualization.py - FIXED VERSION
 """
-Visualization utilities
+Visualization utilities - OPTIMIZED FOR CLOUD
 """
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -9,12 +9,16 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
 from datetime import datetime
-from config import settings
+from config.settings import settings
 
 class ChartBuilder:
     @staticmethod
-    def plot_candlestick(df, title="Price Chart", num_candles=100):
+    def plot_candlestick(df, title="Price Chart", num_candles=100, filename=None):
         """Create candlestick chart"""
+        if filename is None:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"candlestick_{timestamp}"
+        
         plot_df = df.tail(num_candles) if len(df) > num_candles else df
         
         fig = go.Figure(data=[go.Candlestick(
@@ -33,11 +37,20 @@ class ChartBuilder:
             template='plotly_dark'
         )
         
-        fig.show()
+        # Save as HTML
+        os.makedirs('reports', exist_ok=True)
+        html_path = f"reports/{filename}.html"
+        fig.write_html(html_path)
+        print(f"📊 Candlestick chart saved: {html_path}")
+        return html_path
     
     @staticmethod
-    def plot_strategy_comparison(strategies_results, benchmark_return=0):
+    def plot_strategy_comparison(strategies_results, benchmark_return=0, filename=None):
         """Compare multiple strategies"""
+        if filename is None:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"strategy_comparison_{timestamp}"
+        
         fig = go.Figure()
         
         for strategy_name, results in strategies_results.items():
@@ -57,7 +70,6 @@ class ChartBuilder:
         
         # Add benchmark
         if benchmark_return != 0:
-            # Simple straight line for benchmark
             fig.add_hline(y=benchmark_return, 
                          line_dash="dash", 
                          line_color="gray",
@@ -71,11 +83,20 @@ class ChartBuilder:
             hovermode='x unified'
         )
         
-        fig.show()
+        # Save as HTML
+        os.makedirs('reports', exist_ok=True)
+        html_path = f"reports/{filename}.html"
+        fig.write_html(html_path)
+        print(f"📊 Strategy comparison saved: {html_path}")
+        return html_path
     
     @staticmethod
-    def plot_performance_metrics(metrics_dict):
+    def plot_performance_metrics(metrics_dict, filename=None):
         """Plot performance metrics as bar chart"""
+        if filename is None:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"performance_metrics_{timestamp}"
+        
         metrics = list(metrics_dict.keys())
         values = list(metrics_dict.values())
         
@@ -95,17 +116,26 @@ class ChartBuilder:
             template='plotly_dark'
         )
         
-        fig.show()
+        # Save as HTML
+        os.makedirs('reports', exist_ok=True)
+        html_path = f"reports/{filename}.html"
+        fig.write_html(html_path)
+        print(f"📊 Performance metrics saved: {html_path}")
+        return html_path
     
     @staticmethod
     def create_dashboard(results, strategy_name="Strategy"):
         """Create comprehensive dashboard - FIXED VERSION"""
         if 'equity_curve' not in results or not results['equity_curve']:
             print("No data for dashboard")
-            return
+            return None
+        
+        # Generate filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"dashboard_{strategy_name}_{timestamp}"
         
         equity_df = pd.DataFrame(results['equity_curve'])
-        trades_df = pd.DataFrame(results['trades'])
+        trades_df = pd.DataFrame(results['trades']) if 'trades' in results else pd.DataFrame()
         
         # FIX: Gunakan 2x3 grid dengan tipe plot yang compatible
         fig = make_subplots(
@@ -169,8 +199,8 @@ class ChartBuilder:
                           name='Monthly Returns', marker_color='green'),
                     row=2, col=2
                 )
-            except:
-                pass
+            except Exception as e:
+                print(f"⚠️  Monthly returns plot skipped: {e}")
         
         # 5. Risk Metrics (text - row 3, col 1)
         risk_text = f"""
@@ -223,17 +253,104 @@ class ChartBuilder:
         fig.update_xaxes(title_text="Month", row=2, col=2)
         fig.update_yaxes(title_text="Return (%)", row=2, col=2)
         
-        fig.show()
-        
         # Save dashboard
+        os.makedirs('reports', exist_ok=True)
         os.makedirs(settings.RESULTS_DIR, exist_ok=True)
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"dashboard_{strategy_name}_{timestamp}.html"
-        filepath = os.path.join(settings.RESULTS_DIR, filename)
         
-        fig.write_html(filepath)
-        print(f"📊 Dashboard saved: {filepath}")
+        # Save to reports folder (HTML for viewing)
+        html_path = f"reports/{filename}.html"
+        fig.write_html(html_path)
+        print(f"📊 Dashboard saved: {html_path}")
+        
+        # Also save to results folder for backup
+        results_path = os.path.join(settings.RESULTS_DIR, f"{filename}.html")
+        fig.write_html(results_path)
+        
+        return html_path
+    
+    @staticmethod
+    def plot_equity_curve_simple(results, filename=None):
+        """Simple equity curve plot"""
+        if filename is None:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"equity_curve_{timestamp}"
+        
+        if 'equity_curve' not in results:
+            print("No equity curve data")
+            return None
+        
+        equity_df = pd.DataFrame(results['equity_curve'])
+        
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=equity_df['timestamp'],
+            y=equity_df['equity'],
+            mode='lines',
+            name='Equity',
+            line=dict(color='blue', width=2)
+        ))
+        
+        # Add buy/sell markers jika ada trades
+        if 'trades' in results and len(results['trades']) > 0:
+            trades_df = pd.DataFrame(results['trades'])
+            buy_trades = trades_df[trades_df['type'] == 'BUY']
+            sell_trades = trades_df[trades_df['type'] == 'SELL']
+            
+            if not buy_trades.empty:
+                fig.add_trace(go.Scatter(
+                    x=buy_trades['timestamp'],
+                    y=buy_trades['price'],
+                    mode='markers',
+                    name='Buy',
+                    marker=dict(symbol='triangle-up', size=10, color='green')
+                ))
+            
+            if not sell_trades.empty:
+                fig.add_trace(go.Scatter(
+                    x=sell_trades['timestamp'],
+                    y=sell_trades['price'],
+                    mode='markers',
+                    name='Sell',
+                    marker=dict(symbol='triangle-down', size=10, color='red')
+                ))
+        
+        fig.update_layout(
+            title='Equity Curve',
+            xaxis_title='Date',
+            yaxis_title='Equity ($)',
+            template='plotly_dark',
+            hovermode='x unified'
+        )
+        
+        # Save as HTML
+        os.makedirs('reports', exist_ok=True)
+        html_path = f"reports/{filename}.html"
+        fig.write_html(html_path)
+        print(f"📊 Equity curve saved: {html_path}")
+        return html_path
+
+# Helper function untuk save plot
+def save_plotly_figure(fig, filename, description=""):
+    """Save plotly figure with automatic naming"""
+    os.makedirs('reports', exist_ok=True)
+    
+    # Add timestamp if not present
+    if not any(x in filename for x in ['_202', '_2025', '_2024']):
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{filename}_{timestamp}"
+    
+    # Ensure .html extension
+    if not filename.endswith('.html'):
+        filename = f"{filename}.html"
+    
+    html_path = f"reports/{filename}"
+    fig.write_html(html_path)
+    
+    print(f"📊 {description} saved: {html_path}")
+    print(f"   📎 Open in Cloud Shell Editor → reports/ → {filename}")
+    return html_path
 
 if __name__ == "__main__":
     # Test visualization
-    print("ChartBuilder class ready for use")
+    print("✅ ChartBuilder class ready for use")
+    print("📁 Reports will be saved to: reports/")

@@ -1,3 +1,4 @@
+from config.settings import settings
 # backtest/optimizer.py
 """
 Strategy parameter optimization

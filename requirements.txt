@@ -18,4 +18,4 @@ backtesting==0.6.5
 python-dateutil==2.9.0
 pytz==2025.2
 seaborn==0.13.2
-schedule==1.2.0
+schedule==1.2.0python-binance>=3.0.0

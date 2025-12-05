@@ -37,12 +37,13 @@ def main_menu():
     print("1. Run Backtest with Default Strategy")
     print("2. Optimize Strategy Parameters")
     print("3. Compare Multiple Strategies")
-    print("4. Paper Trading & COMPOUNDING BOT")  # ⬅️ UPDATE NAMA
-    print("5. View Settings")
-    print("6. Exit")
+    print("4. Paper Trading & COMPOUNDING BOT")
+    print("5. Paper Trade NXPC/USDT (BINANCE TESTNET)")
+    print("6. View Settings")
+    print("7. Exit")
     print("="*60)
     
-    choice = input("Select option (1-6): ").strip()
+    choice = input("Select option (1-7): ").strip()
     return choice
 
 
@@ -404,6 +405,474 @@ def paper_trading():
     log_info("Paper trading session completed")
 
 
+def paper_trade_nxpc():
+    """Paper trading khusus untuk NXPC/USDT di Binance Testnet"""
+    print("\n" + "="*60)
+    print("📊 PAPER TRADE NXPC/USDT - BINANCE TESTNET")
+    print("="*60)
+    
+    # Pilih mode
+    print("\n🎯 Pilih Mode:")
+    print("1. Market Data & Analysis")
+    print("2. Simulasi Trading (Paper Trade)")
+    print("3. Eksekusi Real di Testnet (Fake Money)")
+    print("4. Kembali ke Menu Utama")
+    
+    choice = input("\nPilih opsi (1-4): ").strip()
+    
+    if choice == '1':
+        nxpc_market_analysis()
+    elif choice == '2':
+        nxpc_paper_trade_sim()
+    elif choice == '3':
+        nxpc_real_testnet()
+    elif choice == '4':
+        return
+    else:
+        print("❌ Pilihan tidak valid!")
+
+def nxpc_market_analysis():
+    """Analisis market NXPC/USDT"""
+    print("\n📈 ANALISIS MARKET NXPC/USDT")
+    print("-" * 40)
+    
+    try:
+        from binance.client import Client
+        
+        # Load API keys dari file python_binance.py atau .env
+        try:
+            # Coba import dari file yang ada
+            import python_binance
+            api_key = python_binance.api_key
+            api_secret = python_binance.api_secret
+        except:
+            print("⚠️  API Key tidak ditemukan!")
+            print("\nBuat file python_binance.py dengan struktur:")
+            print("api_key = 'API_KEY_ANDA'")
+            print("api_secret = 'SECRET_KEY_ANDA'")
+            return
+        
+        # Inisialisasi client
+        client = Client(api_key, api_secret, testnet=True)
+        
+        # 1. Dapatkan info pair
+        symbol_info = client.get_symbol_info('NXPCUSDT')
+        print("✅ Pair NXPC/USDT tersedia")
+        print(f"   Status: {symbol_info['status']}")
+        
+        # 2. Harga saat ini
+        ticker = client.get_symbol_ticker(symbol='NXPCUSDT')
+        current_price = float(ticker['price'])
+        print(f"\n💰 Harga saat ini: ${current_price:.6f}")
+        
+        # 3. Order Book (depth)
+        print("\n📊 Order Book (Top 5):")
+        depth = client.get_order_book(symbol='NXPCUSDT', limit=5)
+        
+        print("   BELI (Bids):")
+        for bid in depth['bids'][:3]:
+            price = float(bid[0])
+            qty = float(bid[1])
+            print(f"     ${price:.6f} - {qty:.0f} NXPC")
+        
+        print("\n   JUAL (Asks):")
+        for ask in depth['asks'][:3]:
+            price = float(ask[0])
+            qty = float(ask[1])
+            print(f"     ${price:.6f} - {qty:.0f} NXPC")
+        
+        # 4. Recent trades
+        print("\n🔄 Recent Trades:")
+        trades = client.get_recent_trades(symbol='NXPCUSDT', limit=5)
+        for trade in trades:
+            side = "BUY" if trade['isBuyerMaker'] else "SELL"
+            qty = float(trade['qty'])
+            price = float(trade['price'])
+            print(f"   {side}: {qty:.1f} NXPC @ ${price:.6f}")
+        
+        # 5. Volume 24h
+        ticker_24h = client.get_ticker(symbol='NXPCUSDT')
+        volume = float(ticker_24h['volume'])
+        price_change = float(ticker_24h['priceChangePercent'])
+        
+        print(f"\n📈 Volume 24h: {volume:.0f} NXPC")
+        print(f"   Perubahan: {price_change:+.2f}%")
+        
+        # 6. Balance akun
+        print("\n💼 Balance Akun Anda:")
+        account = client.get_account()
+        for balance in account['balances']:
+            if balance['asset'] in ['NXPC', 'USDT', 'BTC', 'ETH']:
+                free = float(balance['free'])
+                if free > 0:
+                    print(f"   {balance['asset']}: {free:.6f}")
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def nxpc_paper_trade_sim():
+    """Simulasi paper trading untuk NXPC/USDT"""
+    print("\n📝 SIMULASI PAPER TRADING NXPC/USDT")
+    print("-" * 40)
+    
+    try:
+        from binance.client import Client
+        
+        # Load API keys
+        try:
+            import python_binance
+            api_key = python_binance.api_key
+            api_secret = python_binance.api_secret
+        except:
+            print("⚠️  API Key tidak ditemukan!")
+            return
+        
+        client = Client(api_key, api_secret, testnet=True)
+        
+        # Dapatkan data
+        ticker = client.get_symbol_ticker(symbol='NXPCUSDT')
+        current_price = float(ticker['price'])
+        
+        # Balance awal (dummy atau dari API)
+        account = client.get_account()
+        nxpc_balance = 0
+        usdt_balance = 0
+        
+        for balance in account['balances']:
+            if balance['asset'] == 'NXPC':
+                nxpc_balance = float(balance['free'])
+            elif balance['asset'] == 'USDT':
+                usdt_balance = float(balance['free'])
+        
+        print(f"\n💼 Balance Awal:")
+        print(f"   NXPC: {nxpc_balance:.2f}")
+        print(f"   USDT: ${usdt_balance:.2f}")
+        print(f"\n💰 Harga NXPC/USDT: ${current_price:.6f}")
+        
+        # Menu simulasi
+        print("\n🎯 Simulasi Trading:")
+        print("1. Beli NXPC (Market)")
+        print("2. Jual NXPC (Market)")
+        print("3. Set Limit Order")
+        print("4. Lihat hasil simulasi")
+        print("5. Kembali")
+        
+        # Tracking simulasi
+        simulated_trades = []
+        simulated_nxpc = nxpc_balance
+        simulated_usdt = usdt_balance
+        
+        while True:
+            choice = input("\nPilih aksi (1-5): ").strip()
+            
+            if choice == '1':
+                try:
+                    amount = float(input("Jumlah NXPC yang ingin dibeli: "))
+                    cost = amount * current_price
+                    
+                    if simulated_usdt >= cost:
+                        simulated_nxpc += amount
+                        simulated_usdt -= cost
+                        
+                        simulated_trades.append({
+                            'type': 'BUY',
+                            'amount': amount,
+                            'price': current_price,
+                            'cost': cost,
+                            'timestamp': datetime.now().strftime('%H:%M:%S')
+                        })
+                        
+                        print(f"✅ SIMULASI: Beli {amount:.2f} NXPC @ ${current_price:.6f}")
+                        print(f"   Biaya: ${cost:.4f}")
+                    else:
+                        print(f"❌ Saldo USDT tidak cukup! Butuh ${cost:.2f}, punya ${simulated_usdt:.2f}")
+                        
+                except ValueError:
+                    print("❌ Input tidak valid!")
+                    
+            elif choice == '2':
+                try:
+                    amount = float(input("Jumlah NXPC yang ingin dijual: "))
+                    
+                    if simulated_nxpc >= amount:
+                        revenue = amount * current_price
+                        simulated_nxpc -= amount
+                        simulated_usdt += revenue
+                        
+                        simulated_trades.append({
+                            'type': 'SELL',
+                            'amount': amount,
+                            'price': current_price,
+                            'revenue': revenue,
+                            'timestamp': datetime.now().strftime('%H:%M:%S')
+                        })
+                        
+                        print(f"✅ SIMULASI: Jual {amount:.2f} NXPC @ ${current_price:.6f}")
+                        print(f"   Pendapatan: ${revenue:.4f}")
+                    else:
+                        print(f"❌ Saldo NXPC tidak cukup! Butuh {amount:.2f}, punya {simulated_nxpc:.2f}")
+                        
+                except ValueError:
+                    print("❌ Input tidak valid!")
+                    
+            elif choice == '3':
+                print("\n⚠️  Limit order simulation coming soon!")
+                
+            elif choice == '4':
+                print("\n📊 HASIL SIMULASI:")
+                print(f"   Balance NXPC: {simulated_nxpc:.2f}")
+                print(f"   Balance USDT: ${simulated_usdt:.2f}")
+                
+                total_value = simulated_usdt + (simulated_nxpc * current_price)
+                initial_value = usdt_balance + (nxpc_balance * current_price)
+                pnl = total_value - initial_value
+                
+                print(f"   Total Value: ${total_value:.2f}")
+                print(f"   P&L: ${pnl:+.2f} ({pnl/initial_value*100:+.2f}%)")
+                
+                if simulated_trades:
+                    print(f"\n📋 Riwayat Trade ({len(simulated_trades)}):")
+                    for i, trade in enumerate(simulated_trades, 1):
+                        if trade['type'] == 'BUY':
+                            print(f"   {i}. BUY {trade['amount']:.2f} NXPC @ ${trade['price']:.6f}")
+                        else:
+                            print(f"   {i}. SELL {trade['amount']:.2f} NXPC @ ${trade['price']:.6f}")
+                
+            elif choice == '5':
+                break
+                
+            else:
+                print("❌ Pilihan tidak valid!")
+                
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
+def nxpc_real_testnet():
+    """Eksekusi real di Binance Testnet (fake money)"""
+    print("\n🚀 REAL TESTNET TRADING NXPC/USDT")
+    print("-" * 40)
+    print("⚠️  PERINGATAN: Ini akan eksekusi order REAL di Binance Testnet")
+    print("    Menggunakan FAKE MONEY (uang dummy)")
+    print("-" * 40)
+    
+    confirm = input("\nLanjutkan? (y/n): ").strip().lower()
+    if confirm != 'y':
+        print("❌ Dibatalkan!")
+        return
+    
+    try:
+        from binance.client import Client
+        
+        # Load API keys
+        try:
+            import python_binance
+            api_key = python_binance.api_key
+            api_secret = python_binance.api_secret
+        except:
+            print("⚠️  API Key tidak ditemukan!")
+            return
+        
+        client = Client(api_key, api_secret, testnet=True)
+        
+        # Cek balance dulu
+        print("\n💼 Balance Akun:")
+        account = client.get_account()
+        for balance in account['balances']:
+            if balance['asset'] in ['NXPC', 'USDT']:
+                free = float(balance['free'])
+                if free > 0:
+                    print(f"   {balance['asset']}: {free:.6f}")
+        
+        # Cek harga
+        ticker = client.get_symbol_ticker(symbol='NXPCUSDT')
+        current_price = float(ticker['price'])
+        print(f"\n💰 Harga NXPC/USDT: ${current_price:.6f}")
+        
+        # Menu trading
+        print("\n🎯 Pilih Aksi:")
+        print("1. Market Buy")
+        print("2. Market Sell")
+        print("3. Limit Buy")
+        print("4. Limit Sell")
+        print("5. Lihat Open Orders")
+        print("6. Cancel Order")
+        print("7. Kembali")
+        
+        while True:
+            choice = input("\nPilih (1-7): ").strip()
+            
+            if choice == '1':
+                try:
+                    qty = float(input("Jumlah NXPC yang ingin dibeli: "))
+                    
+                    # Cek min quantity (0.1)
+                    if qty < 0.1:
+                        print(f"❌ Minimal beli 0.1 NXPC")
+                        continue
+                    
+                    print(f"\n⚠️  Eksekusi MARKET BUY...")
+                    print(f"   Jumlah: {qty} NXPC")
+                    print(f"   Harga: ~${current_price:.6f}")
+                    
+                    confirm = input("\nKonfirmasi order? (y/n): ").strip().lower()
+                    if confirm == 'y':
+                        order = client.order_market_buy(
+                            symbol='NXPCUSDT',
+                            quantity=qty
+                        )
+                        print(f"\n✅ ORDER BERHASIL!")
+                        print(f"   Order ID: {order['orderId']}")
+                        print(f"   Status: {order['status']}")
+                        print(f"   Executed: {order['executedQty']} NXPC")
+                        print(f"   Cost: {order['cummulativeQuoteQty']} USDT")
+                    else:
+                        print("❌ Order dibatalkan")
+                        
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    
+            elif choice == '2':
+                try:
+                    qty = float(input("Jumlah NXPC yang ingin dijual: "))
+                    
+                    if qty < 0.1:
+                        print(f"❌ Minimal jual 0.1 NXPC")
+                        continue
+                    
+                    print(f"\n⚠️  Eksekusi MARKET SELL...")
+                    print(f"   Jumlah: {qty} NXPC")
+                    print(f"   Harga: ~${current_price:.6f}")
+                    
+                    confirm = input("\nKonfirmasi order? (y/n): ").strip().lower()
+                    if confirm == 'y':
+                        order = client.order_market_sell(
+                            symbol='NXPCUSDT',
+                            quantity=qty
+                        )
+                        print(f"\n✅ ORDER BERHASIL!")
+                        print(f"   Order ID: {order['orderId']}")
+                        print(f"   Status: {order['status']}")
+                        print(f"   Executed: {order['executedQty']} NXPC")
+                        print(f"   Revenue: {order['cummulativeQuoteQty']} USDT")
+                    else:
+                        print("❌ Order dibatalkan")
+                        
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    
+            elif choice == '3':  # Limit Buy
+                try:
+                    qty = float(input("Jumlah NXPC yang ingin dibeli: "))
+                    
+                    if qty < 0.1:
+                        print(f"❌ Minimal beli 0.1 NXPC")
+                        continue
+                    
+                    current_price = float(ticker['price'])
+                    limit_price = float(input(f"Harga limit (current: ${current_price:.4f}): ") or str(round(current_price * 0.99, 4)))
+                    
+                    order_value = qty * limit_price
+                    if order_value < 5:
+                        print(f"❌ Order value terlalu kecil! Minimal $5.00")
+                        print(f"   Value: ${order_value:.2f}")
+                        continue
+                    
+                    print(f"\n⚠️  Eksekusi LIMIT BUY...")
+                    print(f"   Jumlah: {qty} NXPC")
+                    print(f"   Harga limit: ${limit_price:.4f}")
+                    print(f"   Total: ${order_value:.2f}")
+                    
+                    confirm = input("\nKonfirmasi order? (y/n): ").strip().lower()
+                    if confirm == 'y':
+                        order = client.order_limit_buy(
+                            symbol='NXPCUSDT',
+                            quantity=qty,
+                            price=str(limit_price)
+                        )
+                        print(f"\n✅ LIMIT BUY ORDER BERHASIL!")
+                        print(f"   Order ID: {order['orderId']}")
+                        print(f"   Status: {order['status']}")
+                        print(f"   Price: ${order['price']}")
+                        print(f"   Quantity: {order['origQty']} NXPC")
+                    else:
+                        print("❌ Order dibatalkan")
+                        
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    
+            elif choice == '4':  # Limit Sell
+                try:
+                    qty = float(input("Jumlah NXPC yang ingin dijual: "))
+                    
+                    if qty < 0.1:
+                        print(f"❌ Minimal jual 0.1 NXPC")
+                        continue
+                    
+                    current_price = float(ticker['price'])
+                    limit_price = float(input(f"Harga limit (current: ${current_price:.4f}): ") or str(round(current_price * 1.01, 4)))
+                    
+                    order_value = qty * limit_price
+                    if order_value < 5:
+                        print(f"❌ Order value terlalu kecil! Minimal $5.00")
+                        print(f"   Value: ${order_value:.2f}")
+                        continue
+                    
+                    print(f"\n⚠️  Eksekusi LIMIT SELL...")
+                    print(f"   Jumlah: {qty} NXPC")
+                    print(f"   Harga limit: ${limit_price:.4f}")
+                    print(f"   Total: ${order_value:.2f}")
+                    
+                    confirm = input("\nKonfirmasi order? (y/n): ").strip().lower()
+                    if confirm == 'y':
+                        order = client.order_limit_sell(
+                            symbol='NXPCUSDT',
+                            quantity=qty,
+                            price=str(limit_price)
+                        )
+                        print(f"\n✅ LIMIT SELL ORDER BERHASIL!")
+                        print(f"   Order ID: {order['orderId']}")
+                        print(f"   Status: {order['status']}")
+                        print(f"   Price: ${order['price']}")
+                        print(f"   Quantity: {order['origQty']} NXPC")
+                    else:
+                        print("❌ Order dibatalkan")
+                        
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                
+            elif choice == '5':
+                try:
+                    orders = client.get_open_orders(symbol='NXPCUSDT')
+                    if orders:
+                        print(f"\n📋 Open Orders ({len(orders)}):")
+                        for order in orders:
+                            print(f"   ID: {order['orderId']} | {order['side']} {order['origQty']} @ ${order['price']}")
+                    else:
+                        print("📭 Tidak ada open orders")
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    
+            elif choice == '6':
+                try:
+                    order_id = input("Order ID yang ingin dicancel: ").strip()
+                    result = client.cancel_order(symbol='NXPCUSDT', orderId=order_id)
+                    print(f"✅ Order {order_id} dicancel!")
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    
+            elif choice == '7':
+                break
+                
+            else:
+                print("❌ Pilihan tidak valid!")
+                
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
 def view_settings():
     """Display current settings"""
     settings.print_settings()
@@ -445,11 +914,14 @@ def main():
             
             elif choice == '4':
                 paper_trading()
-            
+
             elif choice == '5':
-                view_settings()
+                paper_trade_nxpc()
             
             elif choice == '6':
+                view_settings()
+            
+            elif choice == '7':
                 print("\n👋 Goodbye!")
                 logger.info("Trading Bot stopped")
                 break
