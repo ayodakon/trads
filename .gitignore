@@ -47,3 +47,46 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# ============================================
+# SECURITY: DO NOT COMMIT SECRET FILES!
+# ============================================
+
+# Config files with secrets (use .example instead)
+telegram_config.py
+python_binance.py
+config/api_config.py
+
+# Logs and output files
+logs/
+*.log
+bot_output.log
+bot_test.log
+compounding_test.log
+
+# Data and results
+data/
+results/
+reports/
+charts/
+
+# Backup and temporary files
+*.backup
+*.bak
+backup/
+trads_backup_*/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo

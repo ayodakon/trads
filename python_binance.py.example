@@ -1,39 +1,43 @@
+#!/usr/bin/env python3
+"""
+Binance API Configuration Template
+Copy to python_binance.py and fill with your API keys
+"""
+
 from binance.client import Client
 
-# ============================================
-# BINANCE TESTNET API CONFIGURATION
-# ============================================
-# 1. Go to: https://testnet.binance.vision/
-# 2. Login and generate API Key
-# 3. Copy your keys below:
+# Testnet API keys (for testing/sandbox)
+# Get from: https://testnet.binance.vision/
+TESTNET_API_KEY = "YOUR_TESTNET_API_KEY_HERE"
+TESTNET_API_SECRET = "YOUR_TESTNET_API_SECRET_HERE"
 
-api_key = 'YOUR_API_KEY_HERE'
-api_secret = 'YOUR_SECRET_KEY_HERE'
+# Live API keys (WARNING: REAL MONEY!)
+# Get from: https://www.binance.com/
+LIVE_API_KEY = "YOUR_LIVE_API_KEY_HERE"
+LIVE_API_SECRET = "YOUR_LIVE_API_SECRET_HERE"
 
-# ============================================
-# FUNCTIONS
-# ============================================
-def get_client():
-    """Get Binance client instance"""
-    return Client(api_key, api_secret, testnet=True)
+def get_client(testnet=True):
+    """Get Binance client (testnet or live)"""
+    if testnet:
+        print("🔧 Using Testnet (Sandbox) API")
+        client = Client(TESTNET_API_KEY, TESTNET_API_SECRET)
+        client.testnet = True
+    else:
+        print("⚠️  USING LIVE TRADING - REAL MONEY!")
+        client = Client(LIVE_API_KEY, LIVE_API_SECRET)
+        client.testnet = False
+    
+    return client
 
-def get_account_info():
-    """Get account balance"""
-    client = get_client()
-    return client.get_account()
-
-def test_connection():
+def test_connection(testnet=True):
     """Test connection to Binance"""
-    client = get_client()
     try:
-        balance = client.get_account()
-        print("✅ Binance connection successful")
+        client = get_client(testnet)
+        print(f"✅ Connected to Binance {'Testnet' if testnet else 'Live'}")
         return True
     except Exception as e:
-        print(f"❌ Binance connection failed: {e}")
+        print(f"❌ Connection error: {e}")
         return False
 
-# Only run test if executed directly
 if __name__ == "__main__":
-    print("Testing Binance connection...")
-    test_connection()
+    test_connection(testnet=True)

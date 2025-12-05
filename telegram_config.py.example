@@ -1,0 +1,20 @@
+# Telegram Configuration Template
+# Copy this file to telegram_config.py and fill with your credentials
+
+TELEGRAM_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"  # Get from @BotFather
+CHAT_ID = "YOUR_CHAT_ID_HERE"  # Get using get_chat_id.py
+
+# Trading Settings
+CHECK_INTERVAL = 30  # minutes
+SYMBOL = "NXPCUSDT"
+USE_TESTNET = True  # True for testing, False for live trading
+
+# Strategy Settings
+TARGET_PROFIT_PERCENT = 3.0   # 3% target profit
+STOP_LOSS_PERCENT = 2.0       # 2% stop loss
+COMPOUND_PERCENT = 10.0       # 10% of profit reinvested
+
+# Optional: Advanced settings
+ENABLE_COMPOUNDING = True
+MAX_POSITION_SIZE = 0.5  # Max 50% of portfolio per trade
+MIN_TRADE_AMOUNT = 10.0  # Minimum $10 per trade
