@@ -99,3 +99,27 @@ desktop.ini
 *.old
 *.orig
 *_backup
+
+# Backup files
+backup_*
+trads_backup_*
+
+# API Keys (jangan commit ke GitHub!)
+python_binance.py
+
+# Logs
+*.log
+logs/
+
+# Data files (besar)
+*.csv
+data/*.csv
+
+# Results
+results/
+reports/
+charts/
+
+# Temporary files
+__pycache__/
+*.pyc
